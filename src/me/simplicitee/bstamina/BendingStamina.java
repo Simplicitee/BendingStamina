@@ -7,6 +7,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.simplicitee.bstamina.command.ActiveCmd;
+import me.simplicitee.bstamina.command.StaminaCmd;
 import me.simplicitee.bstamina.storage.Config;
 import me.simplicitee.bstamina.storage.StorageLoader;
 import me.simplicitee.bstamina.util.Stamina;
@@ -25,12 +27,15 @@ public class BendingStamina extends JavaPlugin{
 		FileConfiguration c = config.get();
 		c.addDefault("Properties.MaxStamina", 5000);
 		c.addDefault("Properties.BaseMaxStamina", 1000);
-		c.addDefault("Properties.BaseRecharge", 50);
+		c.addDefault("Properties.BaseRecharge", 5);
 		
 		config.save();
-		storage = new StorageLoader();
+		storage = new StorageLoader(this);
 		
 		getServer().getPluginManager().registerEvents(new BendingStaminaListener(), this);
+		
+		new StaminaCmd();
+		new ActiveCmd();
 		
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			Stamina.createNew(player);
@@ -40,7 +45,7 @@ public class BendingStamina extends JavaPlugin{
 	
 	@Override
 	public void onDisable() {
-		Stamina.saveAll();
+		Stamina.unloadAll();
 	}
 	
 	public static BendingStamina get() {

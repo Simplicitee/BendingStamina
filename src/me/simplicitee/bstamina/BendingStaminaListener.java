@@ -6,14 +6,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.event.AbilityStartEvent;
 
 import me.simplicitee.bstamina.ability.StaminaAbility;
-import me.simplicitee.bstamina.ability.StaminaAbility.StaminaEffect;
 import me.simplicitee.bstamina.util.Stamina;
 
 public class BendingStaminaListener implements Listener{
@@ -35,7 +33,7 @@ public class BendingStaminaListener implements Listener{
 			return;
 		}
 		
-		stamina.save();
+		stamina.unload();
 	}
 	
 	@EventHandler
@@ -50,7 +48,7 @@ public class BendingStaminaListener implements Listener{
 			return;
 		}
 		
-		stamina.save();
+		stamina.unload();
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -71,110 +69,10 @@ public class BendingStaminaListener implements Listener{
 			return;
 		}
 			
-		if (abil.getEffect() == StaminaEffect.USE) {
-			int diff = stamina.getStamina() - abil.getValue();
-			
-			if (diff >= 0) {
-				stamina.setStamina(diff);
-			} else {
-				event.setCancelled(true);
-			}
-		} else if (abil.getEffect() == StaminaEffect.DECREASE_RECHARGE) {
-			final int recharge = stamina.getRecharge();
-			final int diff = stamina.getRecharge() - abil.getValue();
-			
-			if (diff >= 0) {
-				stamina.setRecharge(diff);
-				new BukkitRunnable() {
-	
-					@Override
-					public void run() {
-						if (ability.isRemoved()) {
-							if (stamina.getRecharge() < recharge) {
-								stamina.setRecharge(recharge);
-							}
-							cancel();
-						}
-					}
-					
-				}.runTaskTimer(BendingStamina.get(), 0, 1);
-			} else {
-				event.setCancelled(true);
-			}
-		} else if (abil.getEffect() == StaminaEffect.DECREASE_MAX) {
-			final int max = stamina.getMaxStamina();
-			stamina.setMaxStamina(max - abil.getValue());
-			
-			new BukkitRunnable() {
-				
-				@Override
-				public void run() {
-					if (ability.isRemoved()) {
-						if (stamina.getMaxStamina() < max) {
-							stamina.setRecharge(max);
-						}
-						cancel();
-					}
-				}
-				
-			}.runTaskTimer(BendingStamina.get(), 0, 1);
-		} else if (abil.getEffect() == StaminaEffect.CONTINUOUS_USE) {
-			final int value = abil.getValue();
-			
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					if (ability.isRemoved()) {
-						cancel();
-					}
-					int diff = stamina.getStamina() - value;
-					
-					if (diff >= 0) {
-						stamina.setStamina(diff);
-					} else {
-						ability.remove();
-						cancel();
-					}
-					
-				}
-				
-			}.runTaskTimer(BendingStamina.get(), 0, 20);
-		} else if (abil.getEffect() == StaminaEffect.INCREASE_MAX) {
-			final int max = stamina.getMaxStamina();
-			stamina.setMaxStamina(max + abil.getValue());
-			
-			new BukkitRunnable() {
-				
-				@Override
-				public void run() {
-					if (ability.isRemoved()) {
-						if (stamina.getMaxStamina() > max) {
-							stamina.setRecharge(max);
-						}
-						cancel();
-					}
-				}
-				
-			}.runTaskTimer(BendingStamina.get(), 0, 1);
-		} else if (abil.getEffect() == StaminaEffect.INCREASE_RECHARGE) {
-			final int recharge = stamina.getRecharge();
-			final int diff = stamina.getRecharge() + abil.getValue();
-			
-			stamina.setRecharge(diff);
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					if (ability.isRemoved()) {
-						if (stamina.getRecharge() > recharge) {
-							stamina.setRecharge(recharge);
-						}
-						cancel();
-					}
-				}
-				
-			}.runTaskTimer(BendingStamina.get(), 0, 1);
+		boolean worked = stamina.activateEffect(abil, ability);
+		
+		if (!worked) {
+			event.setCancelled(true);
 		}
 	}
 }

@@ -6,9 +6,14 @@ import java.util.Map;
 public class StaminaAbility {
 	
 	private static final Map<String, StaminaAbility> ABILS = new HashMap<>();
+	public static final StaminaEffect[] NEGATIVE = StaminaEffect.NEGATIVE;
+	public static final StaminaEffect[] POSITIVE = StaminaEffect.POSITIVE;
 
 	public static enum StaminaEffect {
-		USE, DECREASE_MAX, DECREASE_RECHARGE, CONTINUOUS_USE, NONE, INCREASE_MAX, INCREASE_RECHARGE
+		USE, CONTINUOUS_USE, DECREASE_MAX, DECREASE_RECHARGE, NONE, INCREASE_MAX, INCREASE_RECHARGE;
+		
+		private static final StaminaEffect[] NEGATIVE = new StaminaEffect[] {USE, CONTINUOUS_USE, DECREASE_MAX, DECREASE_RECHARGE};
+		private static final StaminaEffect[] POSITIVE = new StaminaEffect[] {INCREASE_MAX, INCREASE_RECHARGE};
 	}
 	
 	private String name;

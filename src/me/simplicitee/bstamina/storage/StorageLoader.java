@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.projectkorra.projectkorra.ability.CoreAbility;
 
+import me.simplicitee.bstamina.BendingStamina;
 import me.simplicitee.bstamina.ability.StaminaAbility;
 import me.simplicitee.bstamina.ability.StaminaAbility.StaminaEffect;
 
@@ -17,18 +19,31 @@ public class StorageLoader {
 	private Map<String, StaminaEffect> effects;
 	private Map<String, Integer> values;
 	
-	public StorageLoader() {
+	public StorageLoader(BendingStamina plugin) {
 		config = new Config(new File("abilities.yml"));
 		effects = new HashMap<>();
 		values = new HashMap<>();
 		
 		loadDefaults();
-		loadAbilities();
+		
+		final long started = System.currentTimeMillis();
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				if (started + 20000 < System.currentTimeMillis()) {
+					cancel();
+				}
+				
+				loadAbilities();
+			}
+			
+		}.runTaskTimer(plugin, 0, 100);
 	}
 	
 	public void loadAbility(CoreAbility ability) {
-		StaminaEffect effect = StaminaEffect.NONE;
-		int value = 0;
+		StaminaEffect effect = StaminaEffect.USE;
+		int value = 20;
 		
 		if (effects.containsKey(ability.getName())) {
 			effect = effects.get(ability.getName());
@@ -53,7 +68,9 @@ public class StorageLoader {
 	
 	public void loadAbilities() {
 		for (CoreAbility ability : CoreAbility.getAbilities()) {
-			loadAbility(ability);
+			if (StaminaAbility.get(ability.getName()) == null) { 
+				loadAbility(ability);
+			}
 		}
 	}
 	
@@ -63,7 +80,7 @@ public class StorageLoader {
 	
 	public void loadDefaults() {
 		effects.put("AirBlast", StaminaEffect.USE);
-		values.put("AirBlast", 10);
+		values.put("AirBlast", 2);
 		
 		effects.put("AirBurst", StaminaEffect.USE);
 		values.put("AirBurst", 20);
@@ -75,7 +92,7 @@ public class StorageLoader {
 		values.put("AirScooter", 10);
 		
 		effects.put("AirSpout", StaminaEffect.DECREASE_RECHARGE);
-		values.put("AirSpout", 15);
+		values.put("AirSpout", 1);
 		
 		effects.put("AirSuction", StaminaEffect.USE);
 		values.put("AirSuction", 10);
@@ -102,7 +119,7 @@ public class StorageLoader {
 		values.put("Flight", 10);
 		
 		effects.put("AcrobatStance", StaminaEffect.DECREASE_RECHARGE);
-		values.put("AcrobatStance", 15);
+		values.put("AcrobatStance", 1);
 		
 		effects.put("HighJump", StaminaEffect.USE);
 		values.put("HighJump", 15);
@@ -123,7 +140,7 @@ public class StorageLoader {
 		values.put("SwiftKick", 30);
 		
 		effects.put("WarriorStance", StaminaEffect.DECREASE_RECHARGE);
-		values.put("WarriorStance", 15);
+		values.put("WarriorStance", 1);
 		
 		effects.put("Immobilize", StaminaEffect.USE);
 		values.put("Immobilize", 70);
@@ -135,7 +152,7 @@ public class StorageLoader {
 		values.put("Collapse", 15);
 		
 		effects.put("EarthArmor", StaminaEffect.DECREASE_RECHARGE);
-		values.put("EarthArmor", 15);
+		values.put("EarthArmor", 1);
 		
 		effects.put("EarthBlast", StaminaEffect.USE);
 		values.put("EarthBlast", 20);
@@ -156,16 +173,16 @@ public class StorageLoader {
 		values.put("RaiseEarth", 20);
 		
 		effects.put("Shockwave", StaminaEffect.USE);
-		values.put("Shockwave", 75);
+		values.put("Shockwave", 3);
 		
 		effects.put("Tremorsense", StaminaEffect.USE);
 		values.put("Tremorsense", 10);
 		
 		effects.put("EarthPillars", StaminaEffect.USE);
-		values.put("EarthPillars", 45);
+		values.put("EarthPillars", 15);
 		
 		effects.put("LavaFlow", StaminaEffect.DECREASE_RECHARGE);
-		values.put("LavaFlow", 15);
+		values.put("LavaFlow", 1);
 		
 		effects.put("Extraction", StaminaEffect.USE);
 		values.put("Extraction", 30);
@@ -177,10 +194,10 @@ public class StorageLoader {
 		values.put("FerroControl", 5);
 		
 		effects.put("Blaze", StaminaEffect.USE);
-		values.put("Blaze", 15);
+		values.put("Blaze", 2);
 		
 		effects.put("FireBlast", StaminaEffect.USE);
-		values.put("FireBlast", 10);
+		values.put("FireBlast", 2);
 		
 		effects.put("FireBurst", StaminaEffect.USE);
 		values.put("FireBurst", 30);
@@ -195,7 +212,7 @@ public class StorageLoader {
 		values.put("HeatControl", 5);
 		
 		effects.put("WallOfFire", StaminaEffect.DECREASE_RECHARGE);
-		values.put("WallOfFire", 15);
+		values.put("WallOfFire", 1);
 		
 		effects.put("FireKick", StaminaEffect.USE);
 		values.put("FireKick", 50);
@@ -207,25 +224,25 @@ public class StorageLoader {
 		values.put("FireWheel", 50);
 		
 		effects.put("JetBlast", StaminaEffect.DECREASE_RECHARGE);
-		values.put("JetBlast", 20);
+		values.put("JetBlast", 1);
 		
 		effects.put("JetBlaze", StaminaEffect.DECREASE_RECHARGE);
-		values.put("JetBlaze", 20);
+		values.put("JetBlaze", 1);
 		
 		effects.put("Combustion", StaminaEffect.USE);
 		values.put("Combustion", 125);
 		
 		effects.put("Lightning", StaminaEffect.USE);
-		values.put("Lightning", 75);
+		values.put("Lightning", 175);
 		
 		effects.put("OctopusForm", StaminaEffect.CONTINUOUS_USE);
 		values.put("OctopusForm", 20);
 		
 		effects.put("Surge", StaminaEffect.CONTINUOUS_USE);
-		values.put("Surge", 30);
+		values.put("Surge", 10);
 		
 		effects.put("Torrent", StaminaEffect.CONTINUOUS_USE);
-		values.put("Torrent", 20);
+		values.put("Torrent", 5);
 		
 		effects.put("WaterBubble", StaminaEffect.CONTINUOUS_USE);
 		values.put("WaterBubble", 5);
@@ -234,7 +251,7 @@ public class StorageLoader {
 		values.put("WaterManipulation", 15);
 		
 		effects.put("WaterSpout", StaminaEffect.DECREASE_RECHARGE);
-		values.put("WaterSpout", 15);
+		values.put("WaterSpout", 1);
 		
 		effects.put("Bloodbending", StaminaEffect.CONTINUOUS_USE);
 		values.put("Bloodbending", 20);
@@ -243,7 +260,7 @@ public class StorageLoader {
 		values.put("IceBullet", 10);
 		
 		effects.put("IceWave", StaminaEffect.DECREASE_RECHARGE);
-		values.put("IceWave", 20);
+		values.put("IceWave", 1);
 		
 		effects.put("HealingWaters", StaminaEffect.CONTINUOUS_USE);
 		values.put("HealingWaters", 10);
